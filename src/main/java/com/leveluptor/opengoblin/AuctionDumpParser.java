@@ -35,20 +35,13 @@ public class AuctionDumpParser {
 
             while (jp.nextToken() != JsonToken.END_OBJECT) {
 
-                jp.nextToken();
-                jp.nextToken();
-
+                jp.nextValue();
 
                 if ("realm".equals(jp.getCurrentName())) {
                     jp.skipChildren();
                 } else if ("auctions".equals(jp.getCurrentName())) {
 
-                    //TODO this is awful! whyyyy is it necessary?
-                    if (jp.getCurrentToken() == JsonToken.START_OBJECT) {
-                        jp.nextToken();
-                    }
-
-                    jp.nextToken();
+                    jp.nextValue();
 
                     while (jp.nextToken() != JsonToken.END_OBJECT) {
                         JsonToken token = jp.nextToken();
