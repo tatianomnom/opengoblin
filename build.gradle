@@ -1,0 +1,46 @@
+buildscript {
+    ext {
+        springBootVersion = '1.2.4.RELEASE'
+    }
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath 'org.akhikhl.gretty:gretty:+'
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+apply plugin: 'org.akhikhl.gretty'
+
+jar {
+    baseName = 'opengoblin'
+    version = '0.0.1-SNAPSHOT'
+}
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    jcenter()
+}
+
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-batch")
+    compile("org.springframework.boot:spring-boot-starter-jdbc")
+    compile("org.springframework.boot:spring-boot-starter-web")
+    runtime("com.h2database:h2")
+    testCompile("org.springframework.boot:spring-boot-starter-test") 
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.4'
+}
+
+gretty {
+    springBoot = true
+    servletContainer = 'tomcat8'
+}
