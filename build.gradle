@@ -45,3 +45,7 @@ gretty {
     springBoot = true
     servletContainer = 'tomcat8'
 }
+
+test {
+    testLogging.showStandardStreams = true
+}

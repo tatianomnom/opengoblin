@@ -1,6 +1,7 @@
 package com.leveluptor.opengoblin;
 
 import java.io.File;
+import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -17,13 +18,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuctionDumpParser {
 
-    Logger logger = LoggerFactory.getLogger(AuctionDumpParser.class);
+    private static final Logger logger = LoggerFactory.getLogger(AuctionDumpParser.class);
 
     @Scheduled(fixedRate=10000)
-    public void parse() {
+    public void scheduledParse() {
+        try {
+            parse("src/main/resources/auctions.json");
+        } catch (Exception e) {
+            e.printStackTrace(); //TODO ouch
+        }
+    }
+
+    public void parse(String path) throws Exception{
         ObjectMapper mapper = new ObjectMapper();
         JsonFactory jsonFactory = mapper.getFactory();
-        try (JsonParser jp = jsonFactory.createParser(new File("src/main/resources/auctions_small.json"))) {
+        try (JsonParser jp = jsonFactory.createParser(new File(path))) {
 
             while (jp.nextToken() != JsonToken.END_OBJECT) {
 
@@ -49,7 +58,7 @@ public class AuctionDumpParser {
             }
 
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            throw e; //TODO don't forget this wicked place!!!
         }
     }
 }
