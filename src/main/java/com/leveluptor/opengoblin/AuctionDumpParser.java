@@ -1,7 +1,7 @@
 package com.leveluptor.opengoblin;
 
 import java.io.File;
-import java.io.IOException;
+import java.util.Iterator;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -20,45 +20,57 @@ public class AuctionDumpParser {
 
     private static final Logger logger = LoggerFactory.getLogger(AuctionDumpParser.class);
 
-    @Scheduled(fixedRate=10000)
+    @Scheduled(fixedRate = 10000)
     public void scheduledParse() {
-        try {
-            parse("src/main/resources/auctions.json");
-        } catch (Exception e) {
-            e.printStackTrace(); //TODO ouch
-        }
+        parse("src/main/resources/auctions.json");
     }
 
-    public void parse(String path) throws Exception{
+    public long parse(String path) {
         ObjectMapper mapper = new ObjectMapper();
         JsonFactory jsonFactory = mapper.getFactory();
+
+        long counter = 0;
+
         try (JsonParser jp = jsonFactory.createParser(new File(path))) {
 
             while (jp.nextToken() != JsonToken.END_OBJECT) {
 
-                jp.nextTextValue();
+                jp.nextToken();
+                jp.nextToken();
+
 
                 if ("realm".equals(jp.getCurrentName())) {
-                    jp.nextTextValue();
                     jp.skipChildren();
                 } else if ("auctions".equals(jp.getCurrentName())) {
-                    jp.nextTextValue();
+
+                    //TODO this is awful! whyyyy is it necessary?
+                    if (jp.getCurrentToken() == JsonToken.START_OBJECT) {
+                        jp.nextToken();
+                    }
+
+                    jp.nextToken();
 
                     while (jp.nextToken() != JsonToken.END_OBJECT) {
                         JsonToken token = jp.nextToken();
-                        if (token != JsonToken.END_OBJECT && jp.readValuesAs(Auction.class).hasNext()) {
-                            Auction auction = jp.readValuesAs(Auction.class).next();
+
+                        Iterator<Auction> auctionIterator = jp.readValuesAs(Auction.class);
+
+                        if (token == JsonToken.FIELD_NAME && auctionIterator.hasNext()) {
+                            Auction auction = auctionIterator.next();
                             logger.info(auction.toString());
+                            counter++;
                         }
                     }
-                    break;
+                    break; //TODO get rid of it
+
                 } else {
                     logger.warn("Ouch: " + jp.getCurrentName());
                 }
             }
 
         } catch (Exception e) {
-            throw e; //TODO don't forget this wicked place!!!
+            logger.error("Error while parsing JSON: ", e);
         }
+        return counter;
     }
 }
