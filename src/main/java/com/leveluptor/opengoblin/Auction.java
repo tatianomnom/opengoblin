@@ -16,18 +16,21 @@ public class Auction {
     private final String owner;
     private final long bid;
     private final long buyout;
+    private final int quantity;
 
     @JsonCreator
     public Auction(@JsonProperty("auc") long auc,
                    @JsonProperty("item") int item,
                    @JsonProperty("owner") String owner,
                    @JsonProperty("bid") long bid,
-                   @JsonProperty("buyout") long buyout) {
+                   @JsonProperty("buyout") long buyout,
+                   @JsonProperty("quantity") int quantity) {
         this.auc = auc;
         this.item = item;
         this.owner = owner;
         this.bid = bid;
         this.buyout = buyout;
+        this.quantity = quantity;
     }
 
     @Override
@@ -38,6 +41,7 @@ public class Auction {
                 ", owner='" + owner + '\'' +
                 ", bid=" + bid +
                 ", buyout=" + buyout +
+                ", quantity=" + quantity +
                 '}';
     }
 }
